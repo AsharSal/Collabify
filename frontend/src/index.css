@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.cursor-marker {
+  position: absolute;
+  background-color: #22c55e;
+  width: 2px;
+  height: 1em;
+  animation: blink 1.5s steps(2, start) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
