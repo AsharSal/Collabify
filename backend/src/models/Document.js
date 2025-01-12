@@ -28,6 +28,7 @@ const DocumentSchema = new mongoose.Schema(
     comments: [
       {
         userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        username: {type: String},
         text: { type: String, required: true },
         createdAt: { type: Date, default: Date.now },
       },

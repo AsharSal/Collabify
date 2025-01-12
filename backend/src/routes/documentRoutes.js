@@ -1,5 +1,5 @@
 const express = require("express");
-const { createDocument, shareDocument, viewDocument, editDocument, addComment, getDocuments } = require("../controllers/documentController");
+const { createDocument, shareDocument, viewDocument, editDocument, addComment, getDocuments,getComments } = require("../controllers/documentController");
 const authMiddleware = require("../middleware/authMiddleware");
 const checkPermissions = require("../middleware/permissionMiddleware");
 const router = express.Router();
@@ -15,5 +15,6 @@ router.post("/share", authMiddleware, shareDocument);
 router.get("/:documentId", authMiddleware, checkPermissions("view"), viewDocument);
 router.post("/:documentId/edit", authMiddleware, checkPermissions("edit"), editDocument);
 router.post("/:documentId/comment", authMiddleware, checkPermissions("comment"), addComment);
+router.get("/:documentId/comments", authMiddleware, checkPermissions("view"), getComments);
 
 module.exports = router;

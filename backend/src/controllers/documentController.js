@@ -142,6 +142,7 @@ exports.addComment = async (req, res) => {
     try {
       // Find the document by ID
       const document = await Document.findById(documentId);
+      const user = await User.findById(userId);
       if (!document) {
         return res.status(404).json({ msg: "Document not found" });
       }
@@ -160,13 +161,37 @@ exports.addComment = async (req, res) => {
       }
   
       // Add the comment to the document
-      document.comments.push({ userId, text });
+      const username = user.name;
+      document.comments.push({ userId, username,text });
       await document.save();
+
+      const addedComment = document.comments[document.comments.length - 1];
+
+      const newComment = {
+        text: addedComment.text,
+        userId: addedComment.userId,
+        _id: addedComment._id,
+        username: addedComment.username,
+      };
   
-      res.status(200).json({ msg: "Comment added successfully", comments: document.comments });
+      res.status(200).json({ msg: "Comment added successfully", comment: newComment });
     } catch (error) {
       res.status(500).json({ msg: "Server Error" });
     }
 };
-  
-  
+
+exports.getComments = async (req, res) => {
+  const { documentId } = req.params;
+
+  try {
+    // Find the document by ID
+    const document = await Document.findById(documentId);
+    if (!document) {
+      return res.status(404).json({ msg: "Document not found" });
+    }
+
+    res.status(200).json(document.comments);
+  } catch (error) {
+    res.status(500).json({ msg: "Server Error" });
+  }
+};
