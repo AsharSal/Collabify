@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "../utils/axios";
+import socket from "../utils/socket";
 import { useParams } from "react-router-dom";
 
 const CommentSection = ({ role }) => {
@@ -21,6 +22,16 @@ const CommentSection = ({ role }) => {
     fetchComments();
   }, [id]);
 
+  useEffect(() => {
+    socket.on("commentAdded", (newComment) => {
+      setComments((prevComments) => [...prevComments, newComment]);
+    });
+
+    return () => {
+      socket.off("commentAdded");
+    };
+  }, []);
+
   // Handle adding a new comment
   const handleAddComment = async (e) => {
     e.preventDefault();
@@ -30,7 +41,8 @@ const CommentSection = ({ role }) => {
       const response = await axios.post(`/documents/${id}/comment`, {
         text: newComment,
       });
-      setComments([...comments, response.data]);  // Append new comment
+      socket.emit("newComment", response.data.comment);
+      setComments([...comments, response.data.comment]);  // Append new comment
       setNewComment("");  // Reset input
     } catch (error) {
       console.error("Failed to add comment", error);
@@ -44,7 +56,7 @@ const CommentSection = ({ role }) => {
         {comments.map((comment) => (
           <div key={comment._id} className="p-3 border rounded-md bg-white">
             <p className="text-sm">{comment.text}</p>
-            <span className="text-xs text-gray-500">— {comment.author}</span>
+            <span className="text-xs text-gray-500">— {comment.username}</span>
           </div>
         ))}
       </div>

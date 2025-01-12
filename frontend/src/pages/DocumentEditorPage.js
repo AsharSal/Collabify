@@ -12,6 +12,7 @@ const DocumentEditorPage = () => {
   const [isTyping, setIsTyping] = useState(false);
   const typingTimeoutRef = useRef(null);
   const textareaRef = useRef(null);
+  const hasJoinedRoom = useRef(false);
 
   const username = localStorage.getItem("username") || "Guest";
 
@@ -32,9 +33,20 @@ const DocumentEditorPage = () => {
 
   // Join the WebSocket room and set up listeners
   useEffect(() => {
-    if (!id) return;
+    if (!id || hasJoinedRoom.current) return;
 
     socket.emit("joinDocument", id, username);
+    hasJoinedRoom.current = true;
+
+    // Cleanup listeners on unmount
+    return () => {
+      socket.off("joinDocument");
+    };
+  }, [id, username]);
+
+
+  useEffect(() => {
+    if (!id ) return;
 
     // Listen for document updates
     socket.on("documentUpdated", (newContent) => {
@@ -86,7 +98,7 @@ const DocumentEditorPage = () => {
         </h2>
 
         {isTyping && (
-          <p className="text-sm text-blue-500 absolute right-8 top-6">
+          <p className="text-sm text-blue-500">
             {isTyping}
           </p>
         )}

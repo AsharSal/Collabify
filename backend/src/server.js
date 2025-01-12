@@ -49,6 +49,13 @@ io.on("connection", (socket) => {
             socket.to(documentId).emit("typing", username);
         });
 
+        //real time adding comments
+
+        socket.on("newComment", (comment) => {
+          console.log("new comment emitted");
+          socket.to(documentId).emit("commentAdded", comment);
+        });
+
         // Disconnect handling
         socket.on("disconnect", () => {
             console.log(`${username} disconnected`);
